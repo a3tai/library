@@ -13,7 +13,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@lucide/svelte": "^1.16.0",
+    "@lucide/svelte": "^1.17.0",
     "@wailsio/runtime": "3.0.0-alpha.79",
     "bits-ui": "^2.18.1",
     "dompurify": "^3.4.7",
