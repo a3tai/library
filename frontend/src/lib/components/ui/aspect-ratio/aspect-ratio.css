@@ -6,9 +6,9 @@
   overflow: hidden;
 }
 
-.uin-aspect > :global(img),
-.uin-aspect > :global(video),
-.uin-aspect > :global(iframe) {
+.uin-aspect > img,
+.uin-aspect > video,
+.uin-aspect > iframe {
   width: 100%;
   height: 100%;
   object-fit: cover;

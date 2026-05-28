@@ -18,12 +18,13 @@ The packaged desktop app is named `Library` (`Library.app`, `Library.exe`, or `b
 
 ## Requirements
 
-- Go 1.25 or newer.
-- Node.js and npm.
+- Go 1.26 or newer.
+- Node.js 24 LTS or newer and npm 11 or newer.
 - Wails v3 CLI (`wails3`).
 - Task (`task`) for the checked-in build workflows.
 
 Linux builds also need the WebKitGTK and GTK development packages expected by Wails.
+Android builds additionally need a Java 17+ runtime and the Android SDK.
 
 ## Development
 
