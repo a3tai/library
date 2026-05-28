@@ -22,6 +22,19 @@ func newTestStore(t *testing.T) *Store {
 	return store
 }
 
+func tempUserConfigDir(t *testing.T) string {
+	t.Helper()
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	t.Setenv("XDG_CONFIG_HOME", filepath.Join(home, ".config"))
+	t.Setenv("APPDATA", filepath.Join(home, "AppData", "Roaming"))
+	base, err := os.UserConfigDir()
+	if err != nil {
+		t.Fatalf("UserConfigDir: %v", err)
+	}
+	return base
+}
+
 func TestDefaultDBPathUsesLibraryDB(t *testing.T) {
 	want := filepath.Join(t.TempDir(), "custom.db")
 	t.Setenv("LIBRARY_DB", want)
@@ -36,11 +49,10 @@ func TestDefaultDBPathUsesLibraryDB(t *testing.T) {
 }
 
 func TestDefaultDBPathIgnoresLegacyBooksDir(t *testing.T) {
-	home := t.TempDir()
-	t.Setenv("HOME", home)
+	base := tempUserConfigDir(t)
 	t.Setenv("LIBRARY_DB", "")
 
-	legacy := filepath.Join(home, "Library", "Application Support", legacyConfigDirName, "library.db")
+	legacy := filepath.Join(base, legacyConfigDirName, "library.db")
 	if err := os.MkdirAll(filepath.Dir(legacy), 0o755); err != nil {
 		t.Fatalf("create legacy dir: %v", err)
 	}
@@ -52,18 +64,16 @@ func TestDefaultDBPathIgnoresLegacyBooksDir(t *testing.T) {
 	if err != nil {
 		t.Fatalf("DefaultDBPath: %v", err)
 	}
-	want := filepath.Join(home, "Library", "Application Support", configDirName, "library.db")
+	want := filepath.Join(base, configDirName, "library.db")
 	if got != want {
 		t.Fatalf("DefaultDBPath = %q, want %q", got, want)
 	}
 }
 
 func TestOpenMigratesLegacyDBToA3TLibrary(t *testing.T) {
-	home := t.TempDir()
-	t.Setenv("HOME", home)
+	base := tempUserConfigDir(t)
 	t.Setenv("LIBRARY_DB", "")
 
-	base := filepath.Join(home, "Library", "Application Support")
 	legacy := filepath.Join(base, legacyConfigDirName, "library.db")
 	next := filepath.Join(base, configDirName, "library.db")
 
@@ -110,12 +120,10 @@ func TestOpenMigratesLegacyDBToA3TLibrary(t *testing.T) {
 }
 
 func TestOpenDoesNotMigrateLegacyDBWhenLibraryDBIsSet(t *testing.T) {
-	home := t.TempDir()
-	t.Setenv("HOME", home)
+	base := tempUserConfigDir(t)
 	custom := filepath.Join(t.TempDir(), "custom.db")
 	t.Setenv("LIBRARY_DB", custom)
 
-	base := filepath.Join(home, "Library", "Application Support")
 	legacy := filepath.Join(base, legacyConfigDirName, "library.db")
 	legacyStore, err := Open(legacy)
 	if err != nil {
