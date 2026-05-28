@@ -1,0 +1,34 @@
+/* ScrollArea — see ./scroll-area.svelte. */
+
+.uin-scroll {
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--uin-fg) 22%, transparent) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+.uin-scroll-vertical   { overflow-y: auto; overflow-x: hidden; }
+.uin-scroll-horizontal { overflow-x: auto; overflow-y: hidden; }
+.uin-scroll-both       { overflow: auto; }
+
+/* WebKit / Chromium / Edge */
+.uin-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.uin-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.uin-scroll::-webkit-scrollbar-thumb {
+  background-clip: padding-box;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-color: color-mix(in srgb, var(--uin-fg) 22%, transparent);
+  transition: background-color var(--uin-dur-1) var(--uin-ease-standard);
+}
+.uin-scroll:hover::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--uin-fg) 32%, transparent);
+}
+.uin-scroll::-webkit-scrollbar-corner {
+  background: transparent;
+}

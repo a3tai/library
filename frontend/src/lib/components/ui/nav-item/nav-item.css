@@ -1,0 +1,46 @@
+/* NavItem — see ./nav-item.svelte. */
+
+.uin-nav-item {
+  display: grid;
+  grid-template-columns: 16px 1fr auto;
+  align-items: center;
+  gap: var(--uin-s-2);
+  border: 0;
+  background: transparent;
+  color: var(--uin-fg);
+  padding: 4px var(--uin-s-2);
+  border-radius: var(--uin-r-sm);
+  text-align: left;
+  font-family: var(--uin-font-ui);
+  font-size: 12.5px;
+  cursor: default;
+  -webkit-app-region: no-drag;
+  transition: background-color var(--uin-dur-1) var(--uin-ease-standard);
+  width: 100%;
+}
+.uin-nav-item:hover {
+  background: var(--uin-mat-hover);
+}
+.uin-nav-item-active {
+  background: var(--uin-mat-selected);
+  color: var(--uin-fg);
+}
+.uin-nav-item:focus-visible {
+  outline: none;
+  box-shadow: var(--uin-focus-ring);
+}
+.uin-nav-item-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.uin-nav-item-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.uin-nav-item-aside {
+  color: var(--uin-fg-dim);
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+}

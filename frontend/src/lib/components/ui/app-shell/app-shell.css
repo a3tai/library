@@ -1,0 +1,51 @@
+/* AppShell — see ./app-shell.svelte. */
+
+.uin-shell {
+  display: grid;
+  height: 100vh;
+  grid-template-rows: auto 1fr auto;
+  grid-template-columns: 1fr;
+  background: var(--uin-bg-base);
+  color: var(--uin-fg);
+  overflow: hidden;
+}
+
+/* Sidebar variants — re-define grid when sidebar is present */
+.uin-shell-has-sidebar.uin-shell-left {
+  grid-template-columns: var(--uin-shell-sb, 240px) 1fr;
+  grid-template-areas:
+    'head head'
+    'side main'
+    'foot foot';
+}
+.uin-shell-has-sidebar.uin-shell-right {
+  grid-template-columns: 1fr var(--uin-shell-sb, 240px);
+  grid-template-areas:
+    'head head'
+    'main side'
+    'foot foot';
+}
+/* No-sidebar fallback */
+.uin-shell:not(.uin-shell-has-sidebar) {
+  grid-template-areas:
+    'head'
+    'main'
+    'foot';
+}
+
+.uin-shell-head { grid-area: head; }
+.uin-shell-side { grid-area: side; overflow: hidden; }
+.uin-shell-main {
+  grid-area: main;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--uin-fg) 18%, transparent) transparent;
+}
+.uin-shell-main::-webkit-scrollbar { width: 10px; }
+.uin-shell-main::-webkit-scrollbar-thumb {
+  background-clip: padding-box;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-color: color-mix(in srgb, var(--uin-fg) 18%, transparent);
+}
+.uin-shell-foot { grid-area: foot; }

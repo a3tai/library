@@ -1,0 +1,28 @@
+/* Toolbar — see ./toolbar.svelte. */
+
+.uin-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 var(--uin-s-3);
+  background: var(--uin-mat-window);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+  font-family: var(--uin-font-ui);
+}
+
+.uin-toolbar-bordered {
+  border-bottom: 1px solid var(--uin-line);
+}
+
+.uin-toolbar-compact { height: 32px; }
+.uin-toolbar-comfortable { height: 40px; }
+.uin-toolbar-roomy { height: 48px; }
+
+/* Toolbar children are interactive — keep app-region: no-drag inherited */
+.uin-toolbar > * {
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+}

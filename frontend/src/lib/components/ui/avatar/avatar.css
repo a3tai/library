@@ -1,0 +1,41 @@
+/* Avatar — see ./avatar.svelte. */
+
+.uin-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--uin-mat-hover);
+  color: var(--uin-fg-mute);
+  overflow: hidden;
+  user-select: none;
+  vertical-align: middle;
+}
+
+.uin-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.uin-avatar-fallback {
+  font-family: var(--uin-font-ui);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.uin-avatar-xs { width: 20px; height: 20px; }
+.uin-avatar-sm { width: 24px; height: 24px; }
+.uin-avatar-md { width: 32px; height: 32px; }
+.uin-avatar-lg { width: 40px; height: 40px; }
+.uin-avatar-xl { width: 56px; height: 56px; }
+
+.uin-avatar-xs .uin-avatar-fallback { font-size: 9px; }
+.uin-avatar-sm .uin-avatar-fallback { font-size: 10px; }
+.uin-avatar-md .uin-avatar-fallback { font-size: 13px; }
+.uin-avatar-lg .uin-avatar-fallback { font-size: 16px; }
+.uin-avatar-xl .uin-avatar-fallback { font-size: 22px; }

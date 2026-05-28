@@ -1,0 +1,52 @@
+/* Breadcrumb — see ./breadcrumb.svelte. */
+
+.uin-crumb {
+  font-family: var(--uin-font-ui);
+}
+
+.uin-crumb-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0;
+  font-size: 12.5px;
+  color: var(--uin-fg-mute);
+}
+
+.uin-crumb-item {
+  display: inline-flex;
+  align-items: center;
+}
+
+.uin-crumb-sep {
+  display: inline-block;
+  margin: 0 6px;
+  color: var(--uin-fg-dim);
+}
+
+.uin-crumb-link {
+  color: var(--uin-fg-mute);
+  text-decoration: none;
+  padding: 2px 4px;
+  margin: 0 -4px;
+  border-radius: 3px;
+  transition:
+    background-color var(--uin-dur-1) var(--uin-ease-standard),
+    color var(--uin-dur-1) var(--uin-ease-standard);
+}
+.uin-crumb-link:hover {
+  background: var(--uin-mat-hover);
+  color: var(--uin-fg);
+}
+
+.uin-crumb-current {
+  color: var(--uin-fg);
+  font-weight: 500;
+}
+.uin-crumb-static {
+  color: var(--uin-fg-mute);
+  font-weight: 400;
+}

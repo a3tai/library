@@ -1,0 +1,32 @@
+/* VirtualList — see ./virtual-list.svelte. */
+
+.uin-vlist {
+  overflow-y: auto;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--uin-fg) 22%, transparent) transparent;
+}
+.uin-vlist::-webkit-scrollbar { width: 10px; }
+.uin-vlist::-webkit-scrollbar-thumb {
+  background-clip: padding-box;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-color: color-mix(in srgb, var(--uin-fg) 22%, transparent);
+}
+
+.uin-vlist-spacer {
+  position: relative;
+  width: 100%;
+}
+.uin-vlist-window {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  will-change: transform;
+}
+.uin-vlist-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}

@@ -1,0 +1,36 @@
+/* Flex — see ./flex.svelte. */
+
+.uin-flex {
+  display: flex;
+  min-width: 0;
+}
+
+.uin-flex-dir-row             { flex-direction: row; }
+.uin-flex-dir-column          { flex-direction: column; }
+.uin-flex-dir-row-reverse     { flex-direction: row-reverse; }
+.uin-flex-dir-column-reverse  { flex-direction: column-reverse; }
+
+.uin-flex-wrap-nowrap       { flex-wrap: nowrap; }
+.uin-flex-wrap-wrap         { flex-wrap: wrap; }
+.uin-flex-wrap-wrap-reverse { flex-wrap: wrap-reverse; }
+
+.uin-flex-gap-1 { gap: var(--uin-s-1); }
+.uin-flex-gap-2 { gap: var(--uin-s-2); }
+.uin-flex-gap-3 { gap: var(--uin-s-3); }
+.uin-flex-gap-4 { gap: var(--uin-s-4); }
+.uin-flex-gap-5 { gap: var(--uin-s-5); }
+.uin-flex-gap-6 { gap: var(--uin-s-6); }
+.uin-flex-gap-7 { gap: var(--uin-s-7); }
+.uin-flex-gap-8 { gap: var(--uin-s-8); }
+
+.uin-flex-align-start    { align-items: flex-start; }
+.uin-flex-align-center   { align-items: center; }
+.uin-flex-align-end      { align-items: flex-end; }
+.uin-flex-align-stretch  { align-items: stretch; }
+.uin-flex-align-baseline { align-items: baseline; }
+
+.uin-flex-justify-start    { justify-content: flex-start; }
+.uin-flex-justify-center   { justify-content: center; }
+.uin-flex-justify-end      { justify-content: flex-end; }
+.uin-flex-justify-between  { justify-content: space-between; }
+.uin-flex-justify-around   { justify-content: space-around; }

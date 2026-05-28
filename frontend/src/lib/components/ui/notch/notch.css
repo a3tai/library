@@ -1,0 +1,49 @@
+/* Notch — see ./notch.svelte. */
+
+.uin-notch {
+  display: flex;
+  align-items: center;
+  gap: var(--uin-s-2);
+  padding: var(--uin-s-2) var(--uin-s-3);
+  background: var(--uin-mat-window);
+  border-bottom: 1px solid var(--uin-line);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  backdrop-filter: blur(20px) saturate(1.5);
+  color: var(--uin-fg);
+}
+
+.uin-notch-leading {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--uin-fg-mute);
+}
+
+.uin-notch-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.uin-notch-title {
+  margin: 0;
+  font-family: var(--uin-font-ui);
+  font-weight: 500;
+  font-size: 12.5px;
+  line-height: 1.2;
+  color: var(--uin-fg);
+}
+
+.uin-notch-sub {
+  margin: 1px 0 0;
+  font-size: 11px;
+  line-height: 1.2;
+  color: var(--uin-fg-mute);
+}
+
+.uin-notch-trailing {
+  display: flex;
+  align-items: center;
+  gap: var(--uin-s-1);
+  flex-shrink: 0;
+  margin-left: auto;
+}

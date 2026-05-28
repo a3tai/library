@@ -1,0 +1,45 @@
+/* TrafficLights — see ./traffic-lights.svelte. */
+
+.uin-tl {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+}
+
+.uin-tl-btn {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 0.5px solid color-mix(in srgb, #000 20%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  font-family: var(--uin-font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  color: color-mix(in srgb, #000 60%, transparent);
+}
+
+.uin-tl-btn span {
+  opacity: 0;
+  transition: opacity var(--uin-dur-1) var(--uin-ease-standard);
+}
+.uin-tl:hover .uin-tl-btn span,
+.uin-tl-show .uin-tl-btn span {
+  opacity: 1;
+}
+
+.uin-tl-close { background: #ff5f57; }
+.uin-tl-min { background: #febc2e; }
+.uin-tl-zoom { background: #28c840; }
+
+.uin-tl-disabled .uin-tl-btn {
+  background: var(--uin-fg-faint);
+  cursor: not-allowed;
+}
+.uin-tl-disabled .uin-tl-btn span { opacity: 0; }

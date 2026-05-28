@@ -1,0 +1,47 @@
+/* Sidebar — see ./sidebar.svelte. */
+
+.uin-sidebar {
+  display: flex;
+  flex-direction: column;
+  width: var(--uin-sidebar-w, 240px);
+  background: var(--uin-mat-sidebar);
+  border-right: 1px solid var(--uin-line);
+  overflow: hidden;
+  transition: width var(--uin-dur-2) var(--uin-ease-standard);
+}
+
+.uin-sidebar-right {
+  border-right: 0;
+  border-left: 1px solid var(--uin-line);
+}
+
+.uin-sidebar-collapsed {
+  width: var(--uin-sidebar-cw, 48px);
+}
+
+.uin-sidebar-head {
+  padding: var(--uin-s-3);
+  border-bottom: 1px solid var(--uin-line);
+  flex-shrink: 0;
+}
+
+.uin-sidebar-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--uin-fg) 18%, transparent) transparent;
+}
+.uin-sidebar-body::-webkit-scrollbar { width: 8px; }
+.uin-sidebar-body::-webkit-scrollbar-thumb {
+  background-clip: padding-box;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-color: color-mix(in srgb, var(--uin-fg) 18%, transparent);
+}
+
+.uin-sidebar-foot {
+  padding: var(--uin-s-3);
+  border-top: 1px solid var(--uin-line);
+  flex-shrink: 0;
+}

@@ -1,0 +1,15 @@
+{
+	"fixed": {
+		"file_version": "1.0.0"
+	},
+	"info": {
+		"0000": {
+			"ProductVersion": "1.0.0",
+			"CompanyName": "A3T",
+			"FileDescription": "Index and browse a local book library",
+			"LegalCopyright": "© 2026, A3T",
+			"ProductName": "A3T: Library",
+			"Comments": "Local book indexing and MCP search"
+		}
+	}
+}

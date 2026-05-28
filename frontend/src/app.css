@@ -1,0 +1,139 @@
+/* Global app rules. Mittsu tokens (var(--uin-*)) are loaded by
+   tokens.css; component CSS is loaded by components.css. This file is
+   for app-wide chrome that lives outside any single component. */
+
+:root {
+  color-scheme: light dark;
+
+  /* Legacy variable aliases. The pre-Mittsu Reader and Chat components
+     reference these directly; until those two get their own Mittsu pass,
+     the aliases let them inherit token values without per-file edits. */
+  --bg-base: var(--uin-bg-base);
+  --bg-panel: var(--uin-bg-panel);
+  --fg: var(--uin-fg);
+  --fg-mute: var(--uin-fg-mute);
+  --fg-dim: var(--uin-fg-dim);
+  --line: var(--uin-line);
+  --line-strong: var(--uin-line-strong);
+  --accent: var(--uin-accent);
+  --accent-fg: var(--uin-accent-fg);
+  --warn: var(--uin-warn);
+
+  --mat-window: var(--uin-mat-window);
+  --mat-sidebar: var(--uin-mat-sidebar);
+  --mat-panel: var(--uin-mat-panel);
+  --mat-row: var(--uin-mat-row);
+  --mat-hover: var(--uin-mat-hover);
+  --mat-selected: var(--uin-mat-selected);
+
+  --r-sm: var(--uin-r-sm);
+  --r-md: var(--uin-r-md);
+  --r-lg: var(--uin-r-lg);
+  --s-1: var(--uin-s-1);
+  --s-2: var(--uin-s-2);
+  --s-3: var(--uin-s-3);
+  --s-4: var(--uin-s-4);
+  --s-5: var(--uin-s-5);
+  --s-6: var(--uin-s-6);
+  --s-7: var(--uin-s-7);
+
+  --font-ui: var(--uin-font-ui);
+  --font-display: var(--uin-font-display);
+  --font-mono: var(--uin-font-mono);
+
+  --dur-1: var(--uin-dur-1);
+  --dur-2: var(--uin-dur-2);
+  --dur-3: var(--uin-dur-3);
+  --ease-standard: var(--uin-ease-standard);
+  --focus-ring: var(--uin-focus-ring);
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+/* Window corner radius — must match the Wails-side
+   `MacLiquidGlass.CornerRadius` in main.go (16pt). The Tahoe system
+   value for a window with a toolbar is 16pt; the OS clips the
+   window's content view to that mask, but our HTML root needs to
+   know about it too so internal panels (sidebar, inspector) don't
+   paint square over the rounded edge. */
+html,
+body {
+  border-radius: 16px;
+  overflow: hidden;
+  background: transparent;
+}
+#app {
+  border-radius: inherit;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+body {
+  margin: 0;
+  min-width: 720px;
+  color: var(--uin-fg);
+  font-family: var(--uin-font-ui);
+  font-size: 13px;
+  line-height: 1.4;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--uin-accent) 35%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0ms !important;
+    transition-duration: 0ms !important;
+  }
+}
+
+/* Center-well gutter for LibraryMain. Lives here (not in
+   LibraryMain.svelte) because the class is applied to a Mittsu
+   ScrollArea child component and Svelte 5's CSS extractor cannot
+   always be relied on to keep `:global(.main-scroll)` rules around. */
+.main-scroll {
+  flex: 1;
+  min-height: 0;
+  padding: 0 var(--uin-s-5);
+}
+/* PageHeader ships with `padding: 0` on the horizontal axis. With the
+   sticky header inside the ScrollArea, bleed the gutter back so the
+   sticky backdrop reaches the edges of the scroll viewport. */
+.main-scroll .uin-pg-head-sticky {
+  margin-left: calc(var(--uin-s-5) * -1);
+  margin-right: calc(var(--uin-s-5) * -1);
+  padding-left: var(--uin-s-5);
+  padding-right: var(--uin-s-5);
+}
+
+/* Settings center-well gutter. Mirrors .main-scroll so the settings
+   panel doesn't paint to the edge of the window. */
+.settings-scroll {
+  flex: 1;
+  min-height: 0;
+  padding: 0 var(--uin-s-5);
+}
+/* Same gutter-bleed treatment LibraryMain uses so the sticky
+   PageHeader's blurred backdrop covers the scroll viewport edges
+   instead of stopping at the gutter. */
+.settings-scroll .uin-pg-head-sticky {
+  margin-left: calc(var(--uin-s-5) * -1);
+  margin-right: calc(var(--uin-s-5) * -1);
+  padding-left: var(--uin-s-5);
+  padding-right: var(--uin-s-5);
+}

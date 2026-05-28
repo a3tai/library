@@ -1,0 +1,17 @@
+/* NumberInput — see ./number-input.svelte. */
+
+/* Hide the browser's default number-input spinners; Stepper replaces them. */
+.uin-number-input :global(.uin-number-input-el)::-webkit-outer-spin-button,
+.uin-number-input :global(.uin-number-input-el)::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.uin-number-input :global(.uin-number-input-el) {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Tighter trailing slot so the Stepper hugs the right edge. */
+.uin-number-input :global(.uin-input-trailing) {
+  padding-right: 4px;
+}

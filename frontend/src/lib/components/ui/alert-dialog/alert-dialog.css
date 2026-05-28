@@ -1,0 +1,21 @@
+/* AlertDialog — see ./alert-dialog.svelte. Reuses .uin-dialog-* chrome. */
+
+.uin-alert-dialog .uin-dialog-body {
+  /* AlertDialog has no body slot; description carries content. */
+  display: none;
+}
+
+.uin-alert-dialog-foot {
+  /* No top border separator — looks tighter for a confirmation prompt. */
+  border-top: 0;
+  padding-top: var(--uin-s-2);
+}
+
+.uin-alert-dialog-confirm-danger {
+  background: var(--uin-danger);
+  color: #fff;
+  border: 1px solid transparent;
+}
+.uin-alert-dialog-confirm-danger:hover {
+  background: color-mix(in srgb, var(--uin-danger) 88%, #000);
+}

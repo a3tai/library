@@ -1,0 +1,22 @@
+/* Lamp — see ./lamp.svelte. */
+
+.uin-lamp {
+  display: inline-block;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.uin-lamp-idle {
+  background: color-mix(in srgb, var(--uin-fg) 28%, transparent);
+}
+.uin-lamp-running {
+  background: var(--uin-success);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--uin-success) 30%, transparent);
+}
+.uin-lamp-warn {
+  background: var(--uin-warn);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--uin-warn) 35%, transparent);
+}
+.uin-lamp-fail {
+  background: var(--uin-danger);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--uin-danger) 35%, transparent);
+}

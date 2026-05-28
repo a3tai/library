@@ -1,0 +1,19 @@
+/* Box — see ./box.svelte. */
+
+.uin-box {
+  /* intentionally empty — Box is a hook, not a surface */
+}
+
+.uin-box-pad-1 { padding: var(--uin-s-1); }
+.uin-box-pad-2 { padding: var(--uin-s-2); }
+.uin-box-pad-3 { padding: var(--uin-s-3); }
+.uin-box-pad-4 { padding: var(--uin-s-4); }
+.uin-box-pad-5 { padding: var(--uin-s-5); }
+.uin-box-pad-6 { padding: var(--uin-s-6); }
+.uin-box-pad-7 { padding: var(--uin-s-7); }
+.uin-box-pad-8 { padding: var(--uin-s-8); }
+
+.uin-box-r-sm { border-radius: var(--uin-r-sm); }
+.uin-box-r-md { border-radius: var(--uin-r-md); }
+.uin-box-r-lg { border-radius: var(--uin-r-lg); }
+.uin-box-r-xl { border-radius: var(--uin-r-xl); }
