@@ -9,6 +9,11 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    ignore:
+      # Dependabot mis-ranks this older Wails prerelease as newer than alpha.96.
+      - dependency-name: github.com/wailsapp/wails/v3
+        versions:
+          - 3.0.0-alpha.8.3
 
   - package-ecosystem: npm
     directory: /frontend
