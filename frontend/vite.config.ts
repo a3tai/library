@@ -20,6 +20,13 @@ export default defineConfig({
       "dompurify",
     ],
   },
+  build: {
+    rolldownOptions: {
+      checks: {
+        pluginTimings: false,
+      },
+    },
+  },
   server: {
     // Wails proxies asset requests through the dev server. Keep the
     // port stable so the proxy can always find us.
