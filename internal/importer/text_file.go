@@ -1,6 +1,7 @@
 package importer
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -16,6 +17,13 @@ func ImportText(path string) (library.ImportBook, error) {
 	hash, err := fileHash(path)
 	if err != nil {
 		return library.ImportBook{}, err
+	}
+	info, err := importFileInfo(path)
+	if err != nil {
+		return library.ImportBook{}, err
+	}
+	if info.Size() > maxTextFileBytes {
+		return library.ImportBook{}, fmt.Errorf("text file is too large: %d bytes (limit %d)", info.Size(), maxTextFileBytes)
 	}
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -37,6 +45,9 @@ func ImportText(path string) (library.ImportBook, error) {
 	}
 
 	passages := chunkPassages(bookID, "", string(data))
+	if len(passages) > maxPassagesPerBook {
+		return library.ImportBook{}, fmt.Errorf("too many passages extracted from text file (limit %d)", maxPassagesPerBook)
+	}
 	if len(passages) == 0 {
 		book.TextStatus = "text_unavailable"
 	}

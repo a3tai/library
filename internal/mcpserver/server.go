@@ -82,7 +82,7 @@ func (s *Server) HTTPHandler() http.Handler {
 	})
 	mux.HandleFunc("/mcp", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "http://localhost")
-		w.Header().Set("Access-Control-Allow-Headers", "content-type")
+		w.Header().Set("Access-Control-Allow-Headers", "authorization, content-type, x-a3t-mcp-token")
 		w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)
@@ -93,6 +93,7 @@ func (s *Server) HTTPHandler() http.Handler {
 			return
 		}
 		defer r.Body.Close()
+		r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
 		var req Request
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			writeJSON(w, Response{JSONRPC: "2.0", Error: &ResponseError{Code: -32700, Message: err.Error()}})

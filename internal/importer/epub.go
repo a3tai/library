@@ -110,6 +110,9 @@ func ImportEPUB(filePath string) (library.ImportBook, error) {
 			label = strings.TrimSuffix(path.Base(item.Href), path.Ext(item.Href))
 		}
 		passages = append(passages, chunkPassages(bookID, label, text)...)
+		if len(passages) > maxPassagesPerBook {
+			return library.ImportBook{}, fmt.Errorf("too many passages extracted from EPUB (limit %d)", maxPassagesPerBook)
+		}
 	}
 	if len(passages) == 0 {
 		book.TextStatus = "text_unavailable"
@@ -139,12 +142,22 @@ func readZipFile(r *zip.Reader, name string) ([]byte, error) {
 		if path.Clean(file.Name) != name {
 			continue
 		}
+		if file.UncompressedSize64 > maxZipEntryBytes {
+			return nil, fmt.Errorf("%s is too large in EPUB: %d bytes (limit %d)", name, file.UncompressedSize64, maxZipEntryBytes)
+		}
 		rc, err := file.Open()
 		if err != nil {
 			return nil, err
 		}
 		defer rc.Close()
-		return io.ReadAll(rc)
+		data, err := io.ReadAll(io.LimitReader(rc, maxZipEntryBytes+1))
+		if err != nil {
+			return nil, err
+		}
+		if len(data) > maxZipEntryBytes {
+			return nil, fmt.Errorf("%s is too large in EPUB (limit %d)", name, maxZipEntryBytes)
+		}
+		return data, nil
 	}
 	return nil, fmt.Errorf("%s not found in EPUB", name)
 }

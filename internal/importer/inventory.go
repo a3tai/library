@@ -4,7 +4,6 @@ import (
 	"archive/zip"
 	"encoding/xml"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -18,21 +17,17 @@ import (
 // user sees their entire library populate in seconds, with text + FTS
 // happening later in Pass 2.
 //
-// The file is hashed (book id), stat'd (file size), and where possible the
+// The file is fully hashed (book id), stat'd (file size), and where possible the
 // embedded metadata is peeked at — EPUB OPF for title/author/ISBN, filename
 // heuristic everywhere else. PDFs intentionally skip the info dictionary
 // here because reading it requires opening the document and we'd rather
 // defer that work to Pass 2.
 func Inventory(filePath string) (library.Book, error) {
-	// Inventory uses a partial-content hash (size + first 64 KiB + last
-	// 64 KiB) instead of full SHA-256 — enough to dedup a real library at
-	// a fraction of the I/O cost. Pass 2 (IndexBook) keeps the same id
-	// because it just re-uses the row's existing book.ID.
-	hash, err := partialFileHash(filePath)
+	hash, err := fileHash(filePath)
 	if err != nil {
 		return library.Book{}, err
 	}
-	info, err := os.Stat(filePath)
+	info, err := importFileInfo(filePath)
 	if err != nil {
 		return library.Book{}, err
 	}

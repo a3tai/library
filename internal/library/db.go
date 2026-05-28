@@ -62,9 +62,10 @@ func Open(path string) (*Store, error) {
 			}
 		}
 	}
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
 		return nil, err
 	}
+	_ = os.Chmod(filepath.Dir(path), 0o700)
 	// Pragmas applied per-connection via the URL query string. WAL is the
 	// foundation; synchronous=NORMAL is the canonical "fast but crash-safe"
 	// setting (one-fsync-per-checkpoint instead of one-per-commit). The
@@ -93,6 +94,7 @@ func Open(path string) (*Store, error) {
 		db.Close()
 		return nil, err
 	}
+	_ = os.Chmod(path, 0o600)
 	return store, nil
 }
 
@@ -116,9 +118,10 @@ func migrateLegacyDBIfNeeded(target string) error {
 		}
 		return err
 	}
-	if err := os.MkdirAll(filepath.Dir(target), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(target), 0o700); err != nil {
 		return err
 	}
+	_ = os.Chmod(filepath.Dir(target), 0o700)
 	checkpointLegacyDB(legacy)
 	for _, suffix := range []string{"", "-wal", "-shm"} {
 		if err := copyFileIfExists(legacy+suffix, target+suffix); err != nil {
@@ -153,7 +156,7 @@ func copyFileIfExists(src, dst string) error {
 		return err
 	}
 	defer in.Close()
-	out, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, info.Mode().Perm())
+	out, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
 	if err != nil {
 		return err
 	}
@@ -164,7 +167,7 @@ func copyFileIfExists(src, dst string) error {
 	if err := out.Close(); err != nil {
 		return err
 	}
-	return os.Chmod(dst, info.Mode().Perm())
+	return os.Chmod(dst, 0o600)
 }
 
 func (s *Store) Close() error {

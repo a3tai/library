@@ -28,6 +28,12 @@
       <code class="status-url">{mcp.url}</code>
     {/if}
   </div>
+  {#if mcp?.running && mcp.token}
+    <div class="token-row">
+      <span class="token-label">Authorization</span>
+      <code class="token-value">Bearer {mcp.token}</code>
+    </div>
+  {/if}
 
   <div class="grid">
     <Field
@@ -90,5 +96,28 @@
     font-family: var(--uin-font-mono);
     font-size: 12px;
     color: var(--uin-fg-mute);
+  }
+  .token-row {
+    display: grid;
+    grid-template-columns: 112px minmax(0, 1fr);
+    align-items: center;
+    gap: var(--uin-s-2);
+    padding: var(--uin-s-2) var(--uin-s-3);
+    border: 1px solid var(--uin-line);
+    border-radius: var(--uin-r-sm);
+    background: var(--uin-bg-elev);
+  }
+  .token-label {
+    font-size: 12px;
+    color: var(--uin-fg-mute);
+  }
+  .token-value {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: var(--uin-font-mono);
+    font-size: 12px;
+    color: var(--uin-fg);
   }
 </style>

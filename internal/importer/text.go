@@ -25,7 +25,7 @@ func chunkPassages(bookID, label, text string) []library.Passage {
 	}
 	var passages []library.Passage
 	chunk := 0
-	for len(text) > 0 {
+	for len(text) > 0 && len(passages) < maxPassagesPerBook {
 		end := len(text)
 		if end > chunkTarget {
 			end = chunkTarget
