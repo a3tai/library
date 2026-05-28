@@ -1,0 +1,6 @@
+/* Spacer — see ./spacer.svelte. */
+
+.uin-spacer {
+  flex: 1 1 auto;
+  align-self: stretch;
+}

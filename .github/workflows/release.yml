@@ -1,0 +1,171 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - v*.*.*
+  workflow_dispatch:
+
+permissions:
+  attestations: write
+  contents: write
+  id-token: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  verify:
+    name: Verify Release Version
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+      - name: Require tag ref
+        run: |
+          if [ "${GITHUB_REF_TYPE}" != "tag" ]; then
+            echo "Release workflow must run from a version tag such as v1.0.0." >&2
+            exit 1
+          fi
+
+      - name: Check out repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+
+      - name: Verify tag matches app metadata
+        env:
+          VERSION: ${{ github.ref_name }}
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+
+          const expected = process.env.VERSION.replace(/^v/, '');
+          const checks = [
+            ['frontend/package.json', JSON.parse(fs.readFileSync('frontend/package.json', 'utf8')).version],
+            ['build/config.yml', fs.readFileSync('build/config.yml', 'utf8').match(/^\s*version:\s*"([^"]+)"/m)?.[1]],
+            ['libraryservice.go', fs.readFileSync('libraryservice.go', 'utf8').match(/AppVersion\s*=\s*"([^"]+)"/)?.[1]],
+          ];
+
+          const mismatches = checks.filter(([, value]) => value !== expected);
+          if (mismatches.length > 0) {
+            for (const [file, value] of mismatches) {
+              console.error(`${file} is ${value || 'missing'}, expected ${expected}`);
+            }
+            process.exit(1);
+          }
+          NODE
+
+  build:
+    name: Build ${{ matrix.name }}
+    needs: verify
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux
+            os: ubuntu-24.04
+            build: wails3 task linux:build
+            artifact: Library-linux-amd64.tar.gz
+            archive: |
+              mkdir -p dist/linux/Library
+              cp bin/Library README.md LICENSE dist/linux/Library/
+              tar -czf dist/Library-linux-amd64.tar.gz -C dist/linux Library
+          - name: macOS
+            os: macos-latest
+            build: wails3 task darwin:package:universal
+            artifact: Library-macos-universal.zip
+            archive: |
+              mkdir -p dist
+              ditto -c -k --sequesterRsrc --keepParent bin/Library.app dist/Library-macos-universal.zip
+          - name: Windows
+            os: windows-latest
+            build: wails3 task windows:build
+            artifact: Library-windows-amd64.zip
+            archive: |
+              mkdir -p dist/windows/Library
+              cp bin/Library.exe README.md LICENSE dist/windows/Library/
+              pwsh -NoProfile -Command "Compress-Archive -Path dist/windows/Library -DestinationPath dist/Library-windows-amd64.zip -Force"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version-file: go.mod
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential pkg-config libgtk-4-dev libwebkitgtk-6.0-dev
+
+      - name: Install Wails CLI
+        run: |
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+          WAILS_VERSION="$(go list -m -f '{{.Version}}' github.com/wailsapp/wails/v3)"
+          go install github.com/wailsapp/wails/v3/cmd/wails3@"${WAILS_VERSION}"
+
+      - name: Build artifact
+        run: ${{ matrix.build }}
+
+      - name: Archive artifact
+        run: ${{ matrix.archive }}
+
+      - name: Generate artifact attestation
+        if: github.event.repository.visibility == 'public'
+        uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26 # v4
+        with:
+          subject-path: dist/${{ matrix.artifact }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: dist/${{ matrix.artifact }}
+          if-no-files-found: error
+
+  publish:
+    name: Publish GitHub Release
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Generate checksums
+        run: |
+          cd dist
+          sha256sum * > SHA256SUMS.txt
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "${TAG}" >/dev/null 2>&1; then
+            gh release upload "${TAG}" dist/* --clobber
+          else
+            gh release create "${TAG}" dist/* \
+              --title "A3T: Library ${TAG#v}" \
+              --notes "Unsigned desktop artifacts for ${TAG}."
+          fi

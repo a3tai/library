@@ -1,0 +1,79 @@
+/* Resizable — see ./resizable.svelte. */
+
+.uin-resize {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.uin-resize-horizontal { flex-direction: row; }
+.uin-resize-vertical { flex-direction: column; }
+
+.uin-resize-pane {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+}
+
+.uin-resize-handle {
+  flex: 0 0 6px;
+  position: relative;
+  background: transparent;
+  cursor: col-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  touch-action: none;
+}
+.uin-resize-vertical .uin-resize-handle { cursor: row-resize; }
+
+.uin-resize-handle::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--uin-line);
+}
+.uin-resize-vertical .uin-resize-handle::before {
+  inset: 0;
+}
+.uin-resize-horizontal .uin-resize-handle::before {
+  width: 1px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.uin-resize-vertical .uin-resize-handle::before {
+  height: 1px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 100%;
+  left: 0;
+}
+
+.uin-resize-handle:hover::before,
+.uin-resize-handle:active::before {
+  background: var(--uin-accent);
+}
+
+.uin-resize-grip {
+  position: relative;
+  z-index: 1;
+  width: 12px;
+  height: 28px;
+  border-radius: 3px;
+  opacity: 0;
+  background: var(--uin-mat-panel);
+  border: 1px solid var(--uin-line);
+  background-image: radial-gradient(circle, var(--uin-fg-mute) 1px, transparent 1.5px);
+  background-size: 4px 4px;
+  background-repeat: repeat;
+  transition: opacity var(--uin-dur-1) var(--uin-ease-standard);
+}
+.uin-resize-vertical .uin-resize-grip {
+  width: 28px;
+  height: 12px;
+}
+.uin-resize-handle:hover .uin-resize-grip,
+.uin-resize-handle:active .uin-resize-grip {
+  opacity: 1;
+}

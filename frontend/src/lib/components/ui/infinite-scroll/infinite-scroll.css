@@ -1,0 +1,26 @@
+/* InfiniteScroll — see ./infinite-scroll.svelte. */
+
+.uin-infscroll {
+  display: contents;
+}
+
+.uin-infscroll-sentinel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: var(--uin-s-3);
+  font-size: 12px;
+  color: var(--uin-fg-mute);
+}
+
+.uin-infscroll-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--uin-fg-mute);
+}
+.uin-infscroll-end {
+  color: var(--uin-fg-dim);
+  font-style: italic;
+}

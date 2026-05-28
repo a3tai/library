@@ -1,0 +1,47 @@
+/* SplitView — see ./split-view.svelte. */
+
+.uin-split {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--uin-bg-base);
+}
+.uin-split-horizontal { flex-direction: row; }
+.uin-split-vertical { flex-direction: column; }
+
+.uin-split-pane {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+}
+
+.uin-split-handle {
+  flex: 0 0 1px;
+  background: var(--uin-line);
+  position: relative;
+  cursor: col-resize;
+  user-select: none;
+  touch-action: none;
+}
+.uin-split-vertical .uin-split-handle {
+  flex-basis: 1px;
+  cursor: row-resize;
+}
+
+/* Wider hit-target overlay */
+.uin-split-handle::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline: -3px;
+}
+.uin-split-vertical .uin-split-handle::before {
+  inset-inline: 0;
+  inset-block: -3px;
+}
+
+.uin-split-handle:hover,
+.uin-split-handle:active {
+  background: var(--uin-accent);
+}

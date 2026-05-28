@@ -1,0 +1,87 @@
+/* Drawer — see ./drawer.svelte. */
+
+.uin-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: color-mix(in srgb, var(--uin-fg) 28%, transparent);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  z-index: 80;
+  animation: uin-drawer-fade var(--uin-dur-2) var(--uin-ease-standard);
+}
+
+.uin-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(640px, calc(100vw - 16px));
+  background: var(--uin-mat-panel);
+  border: 1px solid var(--uin-line);
+  border-bottom: 0;
+  border-radius: var(--uin-r-lg) var(--uin-r-lg) 0 0;
+  box-shadow: 0 -12px 40px color-mix(in srgb, #000 28%, transparent);
+  z-index: 81;
+  display: flex;
+  flex-direction: column;
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  backdrop-filter: blur(20px) saturate(1.4);
+  overflow: hidden;
+  animation: uin-drawer-slide-up var(--uin-dur-2) var(--uin-ease-standard);
+}
+
+.uin-drawer-sm { height: 40vh; }
+.uin-drawer-md { height: 60vh; }
+.uin-drawer-lg { height: 80vh; }
+.uin-drawer-full { height: 100vh; }
+
+.uin-drawer-handle {
+  margin: 8px auto 4px;
+  width: 36px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--uin-fg-faint);
+  flex-shrink: 0;
+}
+
+.uin-drawer-head {
+  padding: var(--uin-s-3) var(--uin-s-5) var(--uin-s-3);
+  border-bottom: 1px solid var(--uin-line);
+}
+.uin-drawer-title {
+  margin: 0;
+  font-family: var(--uin-font-display);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 1.2;
+  color: var(--uin-fg);
+}
+.uin-drawer-desc {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--uin-fg-mute);
+}
+.uin-drawer-body {
+  flex: 1;
+  padding: var(--uin-s-4) var(--uin-s-5);
+  overflow-y: auto;
+  font-size: 13px;
+  color: var(--uin-fg);
+}
+.uin-drawer-foot {
+  padding: var(--uin-s-3) var(--uin-s-5) var(--uin-s-4);
+  border-top: 1px solid var(--uin-line);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--uin-s-2);
+}
+
+@keyframes uin-drawer-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes uin-drawer-slide-up {
+  from { transform: translate(-50%, 100%); }
+  to { transform: translate(-50%, 0); }
+}

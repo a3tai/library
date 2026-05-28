@@ -1,0 +1,52 @@
+/* Stepper — see ./stepper.svelte. */
+
+.uin-stepper {
+  display: inline-flex;
+  flex-direction: column;
+  border: 1px solid var(--uin-line);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--uin-mat-row);
+  user-select: none;
+}
+
+.uin-stepper-md { width: 16px; height: 22px; }
+.uin-stepper-sm { width: 14px; height: 18px; }
+
+.uin-stepper-btn {
+  flex: 1 1 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: var(--uin-fg-mute);
+  cursor: pointer;
+  padding: 0;
+  transition:
+    background-color var(--uin-dur-1) var(--uin-ease-standard),
+    color var(--uin-dur-1) var(--uin-ease-standard);
+}
+
+.uin-stepper-btn:hover {
+  background: var(--uin-mat-hover);
+  color: var(--uin-fg);
+}
+
+.uin-stepper-btn:active {
+  background: var(--uin-mat-selected);
+  color: var(--uin-accent);
+}
+
+.uin-stepper-btn:disabled {
+  cursor: not-allowed;
+  color: var(--uin-fg-faint);
+}
+.uin-stepper-btn:disabled:hover { background: transparent; color: var(--uin-fg-faint); }
+
+.uin-stepper-up { border-bottom: 1px solid var(--uin-line); }
+
+.uin-stepper-btn:focus-visible {
+  outline: none;
+  background: var(--uin-mat-selected);
+}

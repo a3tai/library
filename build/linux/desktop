@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Name=A3T: Library
+Comment=Index and browse a local book library
+# The Exec line includes %u to pass the URL to the application
+Exec=/usr/local/bin/Library %u
+Terminal=false
+Type=Application
+Icon=Library
+Categories=Office;Education;
+StartupWMClass=Library
+
+ 

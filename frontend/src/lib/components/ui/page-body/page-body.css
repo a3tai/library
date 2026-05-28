@@ -1,0 +1,9 @@
+/* PageBody — see ./page-body.svelte. */
+
+.uin-pg-body {
+  display: block;
+}
+
+.uin-pg-body-padded {
+  padding-block: var(--uin-s-4);
+}

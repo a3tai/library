@@ -1,0 +1,67 @@
+/* Inspector — see ./inspector.svelte. */
+
+.uin-inspector {
+  width: var(--uin-inspector-w, 280px);
+  background: var(--uin-mat-sidebar);
+  border-left: 1px solid var(--uin-line);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: var(--uin-font-ui);
+}
+
+.uin-inspector-head {
+  padding: var(--uin-s-3);
+  border-bottom: 1px solid var(--uin-line);
+  flex-shrink: 0;
+}
+.uin-inspector-title {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--uin-fg);
+}
+
+.uin-inspector-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--uin-s-3) 0;
+}
+
+.uin-inspector-section {
+  padding: 0 var(--uin-s-3) var(--uin-s-4);
+}
+
+.uin-inspector-section-title {
+  margin: 0 0 6px;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--uin-fg-dim);
+  font-weight: 500;
+}
+
+.uin-inspector-rows {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.uin-inspector-row {
+  display: grid;
+  grid-template-columns: minmax(80px, 40%) 1fr;
+  gap: var(--uin-s-2);
+  font-size: 12px;
+  align-items: baseline;
+}
+.uin-inspector-row dt {
+  color: var(--uin-fg-mute);
+  font-weight: 400;
+}
+.uin-inspector-row dd {
+  margin: 0;
+  color: var(--uin-fg);
+  font-weight: 500;
+  text-align: right;
+  word-break: break-word;
+}

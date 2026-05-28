@@ -1,0 +1,26 @@
+/* SearchInput — see ./search-input.svelte. Composes Input + Kbd. */
+
+.uin-search-clear {
+  width: 20px;
+  height: 20px;
+  border: 0;
+  background: color-mix(in srgb, var(--uin-fg) 12%, transparent);
+  color: var(--uin-fg);
+  border-radius: 50%;
+  font-size: 14px;
+  line-height: 1;
+  cursor: default;
+  display: grid;
+  place-items: center;
+  transition: background-color var(--uin-dur-1) var(--uin-ease-standard);
+}
+.uin-search-clear:hover {
+  background: color-mix(in srgb, var(--uin-fg) 22%, transparent);
+}
+.uin-search-clear:focus-visible {
+  outline: none;
+  box-shadow: var(--uin-focus-ring);
+}
+.uin-search-kbd-slot {
+  pointer-events: none;
+}

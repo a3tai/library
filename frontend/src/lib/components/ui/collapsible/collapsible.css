@@ -1,0 +1,44 @@
+/* Collapsible — see ./collapsible.svelte. */
+
+.uin-collapsible-trigger {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: var(--uin-s-2);
+  padding: 8px 10px;
+  border: 0;
+  background: transparent;
+  color: var(--uin-fg);
+  font-family: var(--uin-font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  border-radius: var(--uin-r-sm);
+  transition: background-color var(--uin-dur-1) var(--uin-ease-standard);
+}
+.uin-collapsible-trigger:hover { background: var(--uin-mat-hover); }
+.uin-collapsible-trigger:focus-visible {
+  outline: none;
+  box-shadow: var(--uin-focus-ring);
+}
+.uin-collapsible-trigger[data-disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.uin-collapsible-label { flex: 1; }
+
+.uin-collapsible-chev {
+  color: var(--uin-fg-mute);
+  transition: transform var(--uin-dur-2) var(--uin-ease-standard);
+}
+.uin-collapsible-trigger[data-state="open"] .uin-collapsible-chev {
+  transform: rotate(90deg);
+}
+
+.uin-collapsible-content {
+  padding: var(--uin-s-2) 10px var(--uin-s-3);
+  font-size: 13px;
+  color: var(--uin-fg);
+}

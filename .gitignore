@@ -1,0 +1,69 @@
+# macOS
+.DS_Store
+*.app/
+
+# Local env / secrets
+.env
+.env.*
+.env.local
+.env.*.local
+.npmrc
+frontend/.npmrc
+!.env.example
+!.env.*.example
+
+# Tool caches / reports
+.task/
+.wails/
+playwright-report/
+test-results/
+
+# Go / Wails build outputs
+/books
+/Books
+/librarymcp
+/Library
+/wails_windows_*.syso
+*.test
+coverage.out
+bin/
+
+# Native binaries / installers
+*.AppImage
+*.aab
+*.apk
+*.deb
+*.dll
+*.dmg
+*.dylib
+*.exe
+*.msi
+*.msix
+*.pkg
+*.rpm
+*.so
+*.syso
+
+# Frontend
+frontend/dist/
+frontend/node_modules/
+frontend/.svelte-kit/
+frontend/.vite/
+frontend/screenshots/
+
+# Generated packaging artifacts
+build/appicon.psd
+build/linux/*.desktop
+build/linux/appimage/build/
+build/linux/appimage/*.png
+build/linux/appimage/Books
+build/linux/appimage/Library
+build/windows/nsis/*-installer.exe
+build/windows/nsis/MicrosoftEdgeWebview2Setup.exe
+build/ios/DerivedData/
+build/ios/xcode/
+build/ios/*.xcarchive/
+build/android/.gradle/
+build/android/**/build/
+build/android/**/.cxx/
+build/android/local.properties

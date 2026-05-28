@@ -1,0 +1,7 @@
+/* Center — see ./center.svelte. */
+
+.uin-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

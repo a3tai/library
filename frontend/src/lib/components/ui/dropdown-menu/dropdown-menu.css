@@ -1,0 +1,75 @@
+/* DropdownMenu — see ./dropdown-menu.svelte. Shared by ContextMenu. */
+
+.uin-menu {
+  min-width: 200px;
+  max-width: 320px;
+  background: var(--uin-mat-panel);
+  border: 1px solid var(--uin-line);
+  border-radius: var(--uin-r-md);
+  box-shadow: 0 8px 28px color-mix(in srgb, #000 22%, transparent);
+  padding: 4px;
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  backdrop-filter: blur(20px) saturate(1.4);
+  z-index: 60;
+  font-family: var(--uin-font-ui);
+  font-size: 12.5px;
+  color: var(--uin-fg);
+  animation: uin-menu-in var(--uin-dur-1) var(--uin-ease-standard);
+}
+.uin-menu:focus-visible {
+  outline: none;
+}
+
+.uin-menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--uin-s-2);
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+}
+.uin-menu-item[data-highlighted] {
+  background: var(--uin-mat-selected);
+}
+.uin-menu-item[data-disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.uin-menu-item-danger { color: var(--uin-danger); }
+.uin-menu-item-danger[data-highlighted] {
+  background: color-mix(in srgb, var(--uin-danger) 14%, transparent);
+}
+
+.uin-menu-item-label {
+  flex: 1;
+  text-align: left;
+}
+.uin-menu-item-kbd {
+  font-family: var(--uin-font-mono);
+  font-size: 10.5px;
+  color: var(--uin-fg-mute);
+  letter-spacing: 0.04em;
+}
+
+.uin-menu-sep {
+  height: 1px;
+  background: var(--uin-line);
+  margin: 4px 6px;
+}
+
+.uin-menu-grouplabel {
+  display: block;
+  padding: 6px 10px 4px;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  color: var(--uin-fg-dim);
+}
+
+@keyframes uin-menu-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}

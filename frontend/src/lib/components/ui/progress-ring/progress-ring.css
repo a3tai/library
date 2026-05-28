@@ -1,0 +1,34 @@
+/* ProgressRing — see ./progress-ring.svelte. */
+
+.uin-ring {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+.uin-ring-track {
+  stroke: color-mix(in srgb, var(--uin-fg) 12%, transparent);
+}
+.uin-ring-fill {
+  stroke: var(--uin-accent);
+  transition: stroke-dashoffset var(--uin-dur-2) var(--uin-ease-standard);
+}
+
+.uin-ring-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--uin-font-ui);
+  font-size: 0.4em;
+  font-weight: 500;
+  color: var(--uin-fg);
+}
+
+.uin-ring-sm .uin-ring-label { font-size: 8px; }
+.uin-ring-md .uin-ring-label { font-size: 9.5px; }
+.uin-ring-lg .uin-ring-label { font-size: 12px; }
+.uin-ring-xl .uin-ring-label { font-size: 16px; font-weight: 500; font-family: var(--uin-font-display); }

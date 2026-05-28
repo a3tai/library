@@ -1,0 +1,5 @@
+/* ContextMenu — see ./context-menu.svelte. Reuses .uin-menu-* from DropdownMenu. */
+
+.uin-ctxmenu-trigger {
+  display: contents;
+}
