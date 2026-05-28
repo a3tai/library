@@ -30,6 +30,9 @@ func ImportPDF(filePath string) (library.ImportBook, error) {
 		return library.ImportBook{}, err
 	}
 	defer f.Close()
+	if reader.NumPage() > maxPDFPages {
+		return library.ImportBook{}, fmt.Errorf("PDF has too many pages: %d (limit %d)", reader.NumPage(), maxPDFPages)
+	}
 
 	var passages []library.Passage
 	for pageNo := 1; pageNo <= reader.NumPage(); pageNo++ {
@@ -47,6 +50,9 @@ func ImportPDF(filePath string) (library.ImportBook, error) {
 		}
 		label := fmt.Sprintf("Page %d", pageNo)
 		passages = append(passages, chunkPassages(bookID, label, strings.TrimSpace(text))...)
+		if len(passages) > maxPassagesPerBook {
+			return library.ImportBook{}, fmt.Errorf("too many passages extracted from PDF (limit %d)", maxPassagesPerBook)
+		}
 	}
 	if len(passages) == 0 {
 		book.TextStatus = "text_unavailable"

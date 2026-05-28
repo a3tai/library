@@ -38,7 +38,7 @@
 
 <div class="panel">
   <div class="grid">
-    <Field label="Base URL" description="OpenAI-compatible base, e.g. http://127.0.0.1:1234/v1">
+    <Field label="Base URL" description="OpenAI-compatible localhost base, e.g. http://127.0.0.1:1234/v1">
       {#snippet children({id})}
         <Input {id} bind:value={url} placeholder="http://127.0.0.1:1234/v1" />
       {/snippet}

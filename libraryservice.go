@@ -24,13 +24,14 @@ type LibraryService struct {
 	// LM Studio clients. aiPtr/embed are hot-swappable: the settings panel
 	// rebuilds them when the user changes LM Studio URL/key/model. Read
 	// aiPtr through s.aimeta() so writers and readers don't race.
-	ai     *aimeta.Client
-	embed  *embedder.Provider
-	aiMu   sync.RWMutex
-	mcp    *http.Server
-	mcpURL string
-	mu     sync.Mutex
-	busy   bool
+	ai       *aimeta.Client
+	embed    *embedder.Provider
+	aiMu     sync.RWMutex
+	mcp      *http.Server
+	mcpURL   string
+	mcpToken string
+	mu       sync.Mutex
+	busy     bool
 
 	// Importer state guarded by impMu.
 	impMu     sync.Mutex
@@ -136,6 +137,7 @@ type MCPStatus struct {
 	Running bool   `json:"running"`
 	URL     string `json:"url"`
 	Port    int    `json:"port"`
+	Token   string `json:"token,omitempty"`
 }
 
 func NewLibraryService(dbPath string) (*LibraryService, error) {
@@ -147,7 +149,7 @@ func NewLibraryService(dbPath string) (*LibraryService, error) {
 	// Resolve LM Studio config from DB-backed settings first, falling back
 	// to env vars + defaults. Settings load errors are non-fatal — we just
 	// use the env path.
-	stored, _ := store.GetSettings(context.Background())
+	stored, _ := loadStoredSettings(store)
 	ai := aimeta.NewFromConfig(aimeta.Resolve(stored))
 	emb := embedder.NewFromConfig(embedder.Resolve(stored))
 	s := &LibraryService{
@@ -168,12 +170,6 @@ func NewLibraryService(dbPath string) (*LibraryService, error) {
 	s.kickIndexer()
 	s.kickScanner()
 	s.kickEmbedder()
-	// Start the MCP HTTP server on the default port. Failures are non-fatal
-	// (port in use, etc.) — the user can still toggle it manually from the
-	// sidebar if the auto-start didn't take.
-	if _, err := s.StartMCPServer(0); err != nil {
-		log.Printf("MCP auto-start failed: %v", err)
-	}
 	return s, nil
 }
 

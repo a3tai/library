@@ -8,7 +8,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"time"
 
@@ -57,7 +56,7 @@ func (i *Importer) InventoryPath(ctx context.Context, path string, onProgress Pr
 	if path == "" {
 		return summary, fmt.Errorf("path is required")
 	}
-	info, err := os.Stat(path)
+	info, err := importPathInfo(path)
 	if err != nil {
 		return summary, err
 	}
@@ -75,22 +74,6 @@ func (i *Importer) InventoryPath(ctx context.Context, path string, onProgress Pr
 		}
 		return summary, nil
 	}
-
-	// Bulk-stat + bulk skip-check: build a (path, size) list and ask the
-	// store which ones are already fully indexed. Replaces N round-trips.
-	stats := make([]int64, len(paths))
-	statedPaths := make([]string, 0, len(paths))
-	statedSizes := make([]int64, 0, len(paths))
-	for idx, p := range paths {
-		if info, statErr := os.Stat(p); statErr == nil {
-			stats[idx] = info.Size()
-			statedPaths = append(statedPaths, p)
-			statedSizes = append(statedSizes, info.Size())
-		} else {
-			stats[idx] = -1
-		}
-	}
-	indexed, _ := i.store.IndexedPaths(ctx, statedPaths, statedSizes)
 
 	progress := Progress{Total: len(paths)}
 	if onProgress != nil {
@@ -143,24 +126,13 @@ func (i *Importer) InventoryPath(ctx context.Context, path string, onProgress Pr
 		}
 	}
 
-	for idx, filePath := range paths {
+	for _, filePath := range paths {
 		if ctx.Err() != nil {
 			break
 		}
 		progress.Current = filePath
 		if onProgress != nil {
 			onProgress(progress)
-		}
-
-		size := stats[idx]
-		if size >= 0 && indexed[indexedSkipKey(filePath, size)] {
-			summary.Skipped++
-			progress.Skipped++
-			progress.Processed++
-			if onProgress != nil {
-				onProgress(progress)
-			}
-			continue
 		}
 
 		book, err := Inventory(filePath)
@@ -183,11 +155,6 @@ func (i *Importer) InventoryPath(ctx context.Context, path string, onProgress Pr
 	}
 	flush()
 	return summary, ctx.Err()
-}
-
-// indexedSkipKey mirrors library.indexedKey for the importer's lookup.
-func indexedSkipKey(path string, size int64) string {
-	return path + "\x00" + strconv.FormatInt(size, 10)
 }
 
 // walkSupported recursively scans `path` for files the importer can handle
@@ -232,6 +199,10 @@ func walkSupported(ctx context.Context, path string, info os.FileInfo, summary *
 			emitProgress(false)
 			return nil
 		}
+		if d.Type()&os.ModeSymlink != 0 {
+			emitProgress(false)
+			return nil
+		}
 		if d.IsDir() {
 			emitProgress(false)
 			return nil
@@ -252,7 +223,7 @@ func (i *Importer) ImportPathWithProgress(ctx context.Context, path string, onPr
 	if path == "" {
 		return summary, fmt.Errorf("path is required")
 	}
-	info, err := os.Stat(path)
+	info, err := importPathInfo(path)
 	if err != nil {
 		return summary, err
 	}
@@ -283,20 +254,6 @@ func (i *Importer) ImportPathWithProgress(ctx context.Context, path string, onPr
 		progress.Current = filePath
 		if onProgress != nil {
 			onProgress(progress)
-		}
-
-		// Fast skip: same path + same size means we've already imported this
-		// file unchanged. Avoids the expensive sha256 + parse + upsert pass.
-		if info, statErr := os.Stat(filePath); statErr == nil {
-			if known, err := i.store.IsImported(ctx, filePath, info.Size()); err == nil && known {
-				summary.Skipped++
-				progress.Skipped++
-				progress.Processed++
-				if onProgress != nil {
-					onProgress(progress)
-				}
-				continue
-			}
 		}
 
 		imported, err := ImportFile(filePath)
@@ -338,6 +295,9 @@ func progressFromSummary(s library.ImportSummary, total int, current string) Pro
 }
 
 func ImportFile(path string) (library.ImportBook, error) {
+	if _, err := importFileInfo(path); err != nil {
+		return library.ImportBook{}, err
+	}
 	var (
 		out library.ImportBook
 		err error
@@ -376,6 +336,9 @@ func supported(path string) bool {
 // passage-extracting Pass 2 path where we already have the file open and
 // fully read for text extraction, so the hash is effectively free.
 func fileHash(path string) (string, error) {
+	if _, err := importFileInfo(path); err != nil {
+		return "", err
+	}
 	f, err := os.Open(path)
 	if err != nil {
 		return "", err
@@ -388,18 +351,20 @@ func fileHash(path string) (string, error) {
 	return hex.EncodeToString(h.Sum(nil)), nil
 }
 
-// partialFileHash is the fast variant used for the inventory pass. We hash
+// partialFileHash is kept for older tests/migrations that may need the former
+// fast identity algorithm. The importer now uses full SHA-256 so middle-of-file
+// edits cannot be missed by the inventory pass. This helper hashes
 // (file size, first 64 KiB, last 64 KiB) into a SHA-256 instead of the
-// entire file. For typical EPUBs/PDFs this is enough to disambiguate any
-// two files in a real library (different sizes, different headers, or
-// different trailing bytes), at a tiny fraction of the I/O cost — a 50 MB
-// EPUB drops from ~150 ms of full hashing to under 5 ms.
+// entire file.
 //
 // The returned string is prefixed with "p1:" so existing rows whose
 // file_hash holds the legacy full SHA-256 stay distinct from new inventory
 // rows. Re-imports of the same file always produce the same partial hash,
 // so the UNIQUE constraint on books.file_hash continues to act as a dedup.
 func partialFileHash(path string) (string, error) {
+	if _, err := importFileInfo(path); err != nil {
+		return "", err
+	}
 	const window = 64 * 1024
 	f, err := os.Open(path)
 	if err != nil {
@@ -411,6 +376,9 @@ func partialFileHash(path string) (string, error) {
 		return "", err
 	}
 	size := info.Size()
+	if size > maxImportFileBytes {
+		return "", fmt.Errorf("file is too large: %d bytes (limit %d)", size, maxImportFileBytes)
+	}
 	h := sha256.New()
 	// Mix the size in first so two files that share head/tail bytes but
 	// differ in length still produce different hashes.
@@ -440,6 +408,37 @@ func partialFileHash(path string) (string, error) {
 	}
 	h.Write(tail)
 	return "p1:" + hex.EncodeToString(h.Sum(nil)), nil
+}
+
+func importPathInfo(path string) (os.FileInfo, error) {
+	info, err := os.Lstat(path)
+	if err != nil {
+		return nil, err
+	}
+	if info.Mode()&os.ModeSymlink != 0 {
+		return nil, fmt.Errorf("symlinks are not supported for import: %s", path)
+	}
+	if info.IsDir() {
+		return info, nil
+	}
+	if !info.Mode().IsRegular() {
+		return nil, fmt.Errorf("not a regular file: %s", path)
+	}
+	if info.Size() > maxImportFileBytes {
+		return nil, fmt.Errorf("file is too large: %d bytes (limit %d)", info.Size(), maxImportFileBytes)
+	}
+	return info, nil
+}
+
+func importFileInfo(path string) (os.FileInfo, error) {
+	info, err := importPathInfo(path)
+	if err != nil {
+		return nil, err
+	}
+	if info.IsDir() {
+		return nil, fmt.Errorf("expected a file, got directory: %s", path)
+	}
+	return info, nil
 }
 
 func titleFromPath(path string) string {

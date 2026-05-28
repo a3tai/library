@@ -19,9 +19,9 @@ import (
 	"github.com/a3tai/library/internal/mcpserver"
 )
 
-// chatDebug toggles verbose per-turn logging. On by default — once the
-// chat pipeline is stable again, set LIBRARY_CHAT_DEBUG=0 to silence.
-var chatDebug = envUnsetOrNotZero("LIBRARY_CHAT_DEBUG")
+// chatDebug toggles verbose per-turn logging. Keep it opt-in because chat
+// prompts and tool calls can describe private library contents.
+var chatDebug = envBool("LIBRARY_CHAT_DEBUG")
 
 // chatLogf emits a [chat turnID] prefixed line so successive turns can be
 // untangled in the dev log.
@@ -58,11 +58,7 @@ func emitChatEvent(name string, payload map[string]any) {
 		if name == chatEventDelta {
 			turnID, _ := payload["turnId"].(string)
 			content, _ := payload["content"].(string)
-			head := content
-			if len(head) > 40 {
-				head = head[:40] + "…"
-			}
-			log.Printf("[chat %s] emit %s size=%d %q", turnID, name, len(content), head)
+			log.Printf("[chat %s] emit %s size=%d", turnID, name, len(content))
 		} else {
 			turnID, _ := payload["turnId"].(string)
 			log.Printf("[chat %s] emit %s %v", turnID, name, payload)
@@ -179,7 +175,7 @@ func (s *LibraryService) ChatTurn(req ChatRequest) (ChatResponse, error) {
 	if turnID == "" {
 		turnID = strconv.FormatUint(chatTurnSeq.Add(1), 10)
 	}
-	chatLogf(turnID, "start: book=%s history=%d message=%q", book.ID, len(req.History), truncateText(req.Message, 120))
+	chatLogf(turnID, "start: book=%s history=%d message_len=%d", book.ID, len(req.History), len(req.Message))
 	emitChatEvent(chatEventStart, map[string]any{"turnId": turnID})
 	defer func() {
 		chatLogf(turnID, "defer end")
@@ -353,10 +349,10 @@ func (s *LibraryService) ChatTurn(req ChatRequest) (ChatResponse, error) {
 			fp := call.Function.Name + "|" + argHead
 			toolCallSeen[fp]++
 			if errs[i] != nil {
-				chatLogf(turnID, "round=%d tool=%s args=%q error: %v", round, call.Function.Name, truncateText(call.Function.Arguments, 80), errs[i])
+				chatLogf(turnID, "round=%d tool=%s args_len=%d error: %v", round, call.Function.Name, len(call.Function.Arguments), errs[i])
 			} else {
-				chatLogf(turnID, "round=%d tool=%s args=%q result_len=%d seen=%d",
-					round, call.Function.Name, truncateText(call.Function.Arguments, 80), len(results[i]), toolCallSeen[fp])
+				chatLogf(turnID, "round=%d tool=%s args_len=%d result_len=%d seen=%d",
+					round, call.Function.Name, len(call.Function.Arguments), len(results[i]), toolCallSeen[fp])
 			}
 			// "Empty-ish" = literal `[]`, `{}`, empty string, or just a
 			// "no result" stub. The model interprets these as "I should

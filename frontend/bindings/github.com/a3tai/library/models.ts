@@ -344,6 +344,7 @@ export class MCPStatus {
     "running": boolean;
     "url": string;
     "port": number;
+    "token"?: string;
 
     /** Creates a new MCPStatus instance. */
     constructor($$source: Partial<MCPStatus> = {}) {

@@ -3,13 +3,19 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
+	"net"
+	"net/url"
 	"strings"
 	"time"
 
 	"github.com/a3tai/library/internal/aimeta"
 	"github.com/a3tai/library/internal/embedder"
 	"github.com/a3tai/library/internal/library"
+	"github.com/a3tai/library/internal/secrets"
 )
+
+const lmStudioAPIKeySecretAccount = "lmstudio.api_key"
 
 type Settings struct {
 	LMStudioURL           string `json:"lmstudioURL"`
@@ -35,8 +41,7 @@ type SettingsInput struct {
 // Settings returns the current effective configuration for the settings
 // panel. Stored values win; env vars + built-in defaults fill any blanks.
 func (s *LibraryService) Settings() (Settings, error) {
-	ctx := context.Background()
-	stored, err := s.store.GetSettings(ctx)
+	stored, err := loadStoredSettings(s.store)
 	if err != nil {
 		return Settings{}, err
 	}
@@ -59,18 +64,27 @@ func (s *LibraryService) Settings() (Settings, error) {
 // new effective Settings.
 func (s *LibraryService) UpdateSettings(input SettingsInput) (Settings, error) {
 	ctx := context.Background()
+	if err := validateLMStudioURL(input.LMStudioURL); err != nil {
+		return Settings{}, err
+	}
 	kv := map[string]string{
 		embedder.SettingURL:        strings.TrimSpace(input.LMStudioURL),
 		embedder.SettingEmbedModel: strings.TrimSpace(input.LMStudioEmbedModel),
 		aimeta.SettingChatModel:    strings.TrimSpace(input.LMStudioChatModel),
 	}
 	if input.APIKey != nil {
-		kv[embedder.SettingAPIKey] = strings.TrimSpace(*input.APIKey)
+		key := strings.TrimSpace(*input.APIKey)
+		if err := secrets.Set(lmStudioAPIKeySecretAccount, key); err != nil && key != "" {
+			return Settings{}, fmt.Errorf("secure API key storage is unavailable on this platform; use LIBRARY_LMSTUDIO_API_KEY instead")
+		}
+		// Keep legacy/plaintext DB storage empty. loadStoredSettings overlays
+		// the keychain value back in before constructing clients.
+		kv[embedder.SettingAPIKey] = ""
 	}
 	if err := s.store.SetSettings(ctx, kv); err != nil {
 		return Settings{}, err
 	}
-	stored, err := s.store.GetSettings(ctx)
+	stored, err := loadStoredSettings(s.store)
 	if err != nil {
 		return Settings{}, err
 	}
@@ -90,6 +104,65 @@ func (s *LibraryService) UpdateSettings(input SettingsInput) (Settings, error) {
 	// for any books that don't yet have vectors under the new model.
 	s.kickEmbedder()
 	return s.Settings()
+}
+
+func loadStoredSettings(store *library.Store) (map[string]string, error) {
+	ctx := context.Background()
+	stored, err := store.GetSettings(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if err := validateLMStudioURL(stored[embedder.SettingURL]); err != nil {
+		stored[embedder.SettingURL] = ""
+		_ = store.SetSettings(ctx, map[string]string{embedder.SettingURL: ""})
+	}
+	if key, ok, err := secrets.Get(lmStudioAPIKeySecretAccount); err == nil && ok {
+		if strings.TrimSpace(stored[embedder.SettingAPIKey]) != "" {
+			// One-way migration away from plaintext storage on platforms where
+			// the keychain is available.
+			_ = store.SetSettings(ctx, map[string]string{embedder.SettingAPIKey: ""})
+		}
+		stored[embedder.SettingAPIKey] = key
+		return stored, nil
+	}
+	if legacy := strings.TrimSpace(stored[embedder.SettingAPIKey]); legacy != "" {
+		if err := secrets.Set(lmStudioAPIKeySecretAccount, legacy); err == nil {
+			_ = store.SetSettings(ctx, map[string]string{embedder.SettingAPIKey: ""})
+			stored[embedder.SettingAPIKey] = legacy
+		} else {
+			_ = store.SetSettings(ctx, map[string]string{embedder.SettingAPIKey: ""})
+			stored[embedder.SettingAPIKey] = ""
+		}
+	}
+	return stored, nil
+}
+
+func validateLMStudioURL(raw string) error {
+	raw = strings.TrimSpace(raw)
+	if raw == "" {
+		return nil
+	}
+	parsed, err := url.Parse(raw)
+	if err != nil || parsed.Scheme == "" || parsed.Host == "" {
+		return fmt.Errorf("LM Studio URL must be an absolute HTTP URL")
+	}
+	if parsed.Scheme != "http" && parsed.Scheme != "https" {
+		return fmt.Errorf("LM Studio URL must use http or https")
+	}
+	host := parsed.Hostname()
+	if strings.EqualFold(host, "localhost") {
+		return nil
+	}
+	if ip := net.ParseIP(host); ip != nil && ip.IsLoopback() {
+		return nil
+	}
+	if envBool("LIBRARY_ALLOW_REMOTE_LMSTUDIO") {
+		if parsed.Scheme != "https" {
+			return fmt.Errorf("remote LM Studio URLs require https")
+		}
+		return nil
+	}
+	return fmt.Errorf("LM Studio URL must point at localhost unless LIBRARY_ALLOW_REMOTE_LMSTUDIO=1 is set")
 }
 
 // TestLMStudio probes the configured endpoint with /v1/models. Returns the
